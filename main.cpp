@@ -1,40 +1,43 @@
 #include <QtGui>
 
 #include "rasterwindow.h"
-
-class SmoothArc : public RasterWindow
-{
-public:
-    SmoothArc();
-
-protected:
-    void timerEvent(QTimerEvent *) Q_DECL_OVERRIDE;
-    void render(QPainter *p) Q_DECL_OVERRIDE;
-
-private:
-    int m_timerId;
-    int m_valueTimerId;
-    int m_value;
-};
+#include "smootharc.h"
 
 SmoothArc::SmoothArc()
 {
     setTitle("Smooth Arc");
     resize(200, 200);
 
-    m_timerId = startTimer(33);
+    m_value = 180 * 16;
     m_valueTimerId = startTimer(100);
-    m_value = 50;
+    m_animation.setTargetObject(this);
+    m_animation.setPropertyName("value");
+    m_animation.setEasingCurve(QEasingCurve::OutCirc);
+    m_animation.setDuration(500);
+}
+
+int SmoothArc::value() const
+{
+    return m_value;
+}
+
+void SmoothArc::setValue(int value)
+{
+    m_value = value;
+    renderLater();
 }
 
 void SmoothArc::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == m_timerId)
-        renderLater();
     if (event->timerId() == m_valueTimerId) {
-        m_value = m_value + (qrand() % 11 - 5);
-        if (m_value > 100) m_value = 100;
+        int newValue = m_value + ((qrand() % 21 - 10) * 16);
+        if (m_value > (360 * 16)) m_value = (360 * 16);
         if (m_value < 0) m_value = 0;
+        if (m_animation.state() == QPropertyAnimation::Running)
+            m_animation.stop();
+        m_animation.setStartValue(m_value);
+        m_animation.setEndValue(newValue);
+        m_animation.start();
     }
 }
 
@@ -48,7 +51,7 @@ void SmoothArc::render(QPainter *p)
     QPen pen = p->pen();
     pen.setWidth(10);
     p->setPen(pen);
-    p->drawArc(rect, 90*16, (360*(m_value/100.0))*16);
+    p->drawArc(rect, 90 * 16, m_value);
 }
 
 int main(int argc, char **argv)

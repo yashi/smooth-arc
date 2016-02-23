@@ -1,0 +1,9 @@
+This is a Qt demo to draw an animated arc smoothly.
+
+I've asked at stackoverflow[1] and Mitch gave me a hint to do it with
+Qt Animation Framework.
+
+The latest commit is a port of QWindow from the original QWidget.
+Also, it use int instead of qreal for interpolated values.
+
+[1]: http://stackoverflow.com/questions/35532459

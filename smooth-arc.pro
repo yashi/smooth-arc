@@ -7,4 +7,5 @@ SOURCES += main.cpp \
     rasterwindow.cpp
 
 HEADERS  += \
-    rasterwindow.h
+    rasterwindow.h \
+    smootharc.h
